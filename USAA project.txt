@@ -1,0 +1,23 @@
+﻿Pipeline: 
+Webscraping first, pull all articles 
+Find a way to identify words
+What is being identified: Keywords related to fraud -> origin/process
+Create dataset of detected articles
+Summarize the catalogued articles 
+To-Do:
+Topic filtering implementation, Risk, Regulation Policy 
+
+
+What's working
+
+
+Working through Banking Dive’s HTML style, we found that parsing through the HTML for keywords like Deck, Summary, Rowfeed, Feed and Title_feed would lead us to the article summarized content. The Title and summary are compiled into a CSV for future NLP
+
+
+What's blocked 
+
+
+What's next?
+
+
+When fraud content is detected, click on the link, read the full article and generate context.

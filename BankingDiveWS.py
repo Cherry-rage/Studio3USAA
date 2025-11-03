@@ -45,102 +45,33 @@ def scrape_banking_dive(num_articles=20):
             # 'rowfeed' (for example rowfeed items). Search for any elements whose
             # class contains the substring 'rowfeed' and treat each as an article
             # candidate. This is more robust than relying on a single <ul> wrapper.
-            def has_feed_class(tag):
-                """Return True if the tag's class list contains feed-like tokens.
+            # Removed the has_feed_class helper function as it's no longer needed
 
-                We accept tokens that contain 'rowfeed' or start with/contain 'feed'
-                (e.g., 'feed__item', 'feed__title', 'feed__description').
-                """
-                cls = tag.get('class')
-                if not cls:
-                    return False
-                for c in cls:
-                    if not isinstance(c, str):
-                        continue
-                    low = c.lower()
-                    if 'rowfeed' in low:
-                        return True
-                    # match tokens like 'feed', 'feed__item', 'feed-item', 'feed__title'
-                    if low == 'feed' or low.startswith('feed') or 'feed__' in low or 'feed-' in low:
-                        return True
-                return False
-
-            # Try to find item-level containers first (li/div/article with rowfeed)
-            articles = soup.find_all(lambda tag: tag.name in ('li', 'div', 'article') and has_feed_class(tag))
-
-            # Fallback: sometimes there isn't an explicit rowfeed item element; try
-            # to find any element which contains 'rowfeed' in its class attribute.
-            if not articles:
-                containers = soup.find_all(has_feed_class)
-                # Flatten potential children that look like article nodes
-                for c in containers:
-                    # prefer children that are li/article/div
-                    children = c.find_all(['li', 'article', 'div'])
-                    if children:
-                        for ch in children:
-                            if has_feed_class(ch):
-                                articles.append(ch)
-                            else:
-                                # include the child anyway as a possible article
-                                articles.append(ch)
-                # last resort: if still empty, try all <article> tags
-                if not articles:
-                    articles = soup.find_all('article')
+            # Find all article items in the feed
+            articles = soup.find_all('li', class_='row feed__item')
+            
+            # Filter out advertisement items
+            articles = [article for article in articles if 'feed-item-ad' not in article.get('class', [])]
 
             # If no candidate articles found, assume we've reached the end
             if not articles:
                 print("Found no article-like elements on this page. Stopping.")
                 break
 
-            # Loop through each candidate and extract title + summary with fallbacks
+            # Loop through each article and extract title and summary
             for article in articles:
-                # Title: prefer h3/h2/h1, otherwise first <a> with text
-                title_element = None
-                for tag_name in ('h3', 'h2', 'h1'):
-                    t = article.find(tag_name)
-                    if t and t.get_text(strip=True):
-                        title_element = t
-                        break
-                if not title_element:
-                    a = article.find('a')
-                    if a and a.get_text(strip=True):
-                        title_element = a
-
-                # Summary/description: prefer p with 'deck' or 'summary' in class,
-                # otherwise first <p> with reasonable length
-                summary_element = None
-                # try class-based heuristics
-                for p in article.find_all('p'):
-                    pcls = p.get('class')
-                    text = p.get_text(strip=True)
-                    if not text:
-                        continue
-                    if pcls and any(k in ' '.join(pcls).lower() for k in ('deck', 'summary', 'excerpt', 'dek', 'rowfeed')):
-                        summary_element = p
-                        break
-                # fallback to first <p> with > 20 chars
-                if not summary_element:
-                    for p in article.find_all('p'):
-                        text = p.get_text(strip=True)
-                        if text and len(text) > 20:
-                            summary_element = p
-                            break
-
-                # As an alternate fallback, some summaries are in divs/spans
-                if not summary_element:
-                    for tag in ('div', 'span'):
-                        for el in article.find_all(tag):
-                            text = el.get_text(strip=True)
-                            if text and 20 < len(text) < 500:
-                                summary_element = el
-                                break
-                        if summary_element:
-                            break
-
-                # Ensure we have at least a title (and optionally a summary)
+                # Find the title in h3 with class 'feed__title'
+                title_element = article.find('h3', class_='feed__title')
                 if title_element:
+                    title_element = title_element.find('a')  # Get the link containing the title
+                
+                # Find the summary paragraph with class 'feed__description'
+                summary_element = article.find('p', class_='feed__description')
+
+                # If we found both elements, add them to our data
+                if title_element and summary_element:
                     title = title_element.get_text(strip=True)
-                    summary = summary_element.get_text(strip=True) if summary_element else ''
+                    summary = summary_element.get_text(strip=True)
                     articles_data.append({'title': title, 'summary': summary})
 
                     # Stop once we've hit our target

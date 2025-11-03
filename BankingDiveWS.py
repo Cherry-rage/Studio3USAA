@@ -115,18 +115,26 @@ def main(argv=None):
         print(f"  Title: {article['title']}")
         print(f"  Summary: {article['summary']}")
 
-    # If CSV output requested, write the file
-    if args.csv:
-        try:
-            # Use UTF-8-sig so Excel on Windows can read the UTF-8 CSV correctly
-            with open(args.csv, 'w', newline='', encoding='utf-8-sig') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=['title', 'summary'])
-                writer.writeheader()
-                for article in articles[:args.num]:
-                    writer.writerow({'title': article['title'], 'summary': article['summary']})
-            print(f"\nWrote {len(articles[:args.num])} articles to CSV: {args.csv}")
-        except Exception as e:
-            print(f"Failed to write CSV {args.csv}: {e}")
+    # Always write to articles.csv in the current directory if no CSV path specified
+    output_file = args.csv if args.csv else 'articles.csv'
+    
+    try:
+        # Use UTF-8-sig so Excel on Windows can read the UTF-8 CSV correctly
+        with open(output_file, 'w', newline='', encoding='utf-8-sig') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['title', 'summary'])
+            writer.writeheader()
+            for article in articles[:args.num]:
+                # Clean the data to remove any potential CSV-breaking characters
+                clean_title = article['title'].replace('\n', ' ').replace('\r', '')
+                clean_summary = article['summary'].replace('\n', ' ').replace('\r', '')
+                writer.writerow({
+                    'title': clean_title,
+                    'summary': clean_summary
+                })
+        print(f"\nWrote {len(articles[:args.num])} articles to CSV: {output_file}")
+    except Exception as e:
+        print(f"Failed to write CSV {output_file}: {e}")
+        print("Error details:", str(e))
 
 
 if __name__ == "__main__":

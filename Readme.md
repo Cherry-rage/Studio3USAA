@@ -9,7 +9,6 @@
    - `banking_dive_fraud_visualizations.ipynb` to explore the high-risk subset and prototype visuals.
    - `analysis.ipynb` (new “analysis” notebook) consolidates text mining and metrics referenced below.
    - CSV files under `data/` with full article corpus, fraud-augmented labels, and the fraud-only subset.
- - Quickcontext docs guided the framing (problem statement, success metrics, weekly plan) and ensured alignment with stakeholder language.
 
  ## Snapshot Metrics
  | Metric | Value |
@@ -17,7 +16,6 @@
  | Articles scraped | 200 |
  | Fraud-flagged articles | 16 (8 Wire/Check Fraud, 8 Money Laundering) |
  | Risk mix | 8 High risk vs. 8 Low risk (no Medium flags in current sample) |
- | Fraud-only CSV rows | 2 (manually curated exemplars) |
  | Distinct fraud categories detected | 2 |
 
  ## Key Findings
@@ -33,7 +31,6 @@
  ## Top 5 Keywords / Phrases
  - **Keywords (unigrams)**: Chinese, bank, check, said, employees.
  - **Phrases (bigrams)**: “Chinese American,” “Prosecutors said,” “Chinese Chinese,” “American employees,” “Plaintiffs said.”
- - Source: `analysis.ipynb` (Cell 4) using scikit-learn + regex tokenization over fraud-flagged article bodies.
 
  ## Top 3 Fraud Trends To Track
  1. **Wire & Check Fraud Rings** – Half of all flagged stories cite overlapping wire/check abuse, often tied to branch-level overrides or coerced employees.
@@ -42,8 +39,6 @@
 
  ## Next Steps
  - Expand scraping schedule to capture fresh Banking Dive posts weekly; rerun `analysis.ipynb` to refresh metrics.
- - Layer qualitative context (earnings transcripts, enforcement dockets) atop the existing timelines for richer narrative pitches.
- - Convert notebook insights into polished visuals (word cloud, bigram bar chart, timeline) for presentation-ready assets.
+ - Layer qualitative context (earnings transcripts, enforcement dockets) atop the existing timelines for better narrative pitches.
 
  ---
- _This README consolidates notebook outputs and contextual documents so the storytelling team can jump directly into drafting without rerunning analyses._

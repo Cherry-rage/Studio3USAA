@@ -1,0 +1,21 @@
+# USAA Fraud Research Project Dependencies
+
+# Web Scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# Data Analysis
+pandas>=2.0.0
+numpy>=1.24.0
+
+# NLP
+nltk>=3.8.0
+
+# Visualization
+plotly>=5.18.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities
+python-dateutil>=2.8.0
+streamlit
